@@ -5,29 +5,37 @@ pipeline {
         SERVER_IP = credentials('prod-server')
     }
     stages {
-        stage('Setup') {
-            steps {
-                sh '''
-                sudo su
-                apt update 
-                apt install pip3
-                pip install -r requirements.txt
-                '''
+        stage('Pre') {
+            agent {
+                docker {
+                    image 'python:3.8-alpine'
+                    args "-u root"
+                }
+            }
+            stages {
+                stage('setup') {
+                    steps {
+                        sh '''
+                        sudo su
+                        apt update 
+                        apt install pip3
+                        pip install -r requirements.txt
+                        '''
+                    }
+                }
+                stage('Test') {
+                    steps {
+                        sh "pytest"
+                    }
+                }
+                stage('Package code') {
+                    steps {
+                        sh "zip -r myapp.zip ./* -x '*.git*'"
+                        sh "ls -lart"
+                    }
+                }
             }
         }
-        stage('Test') {
-            steps {
-                sh "pytest"
-            }
-        }
-
-        stage('Package code') {
-            steps {
-                sh "zip -r myapp.zip ./* -x '*.git*'"
-                sh "ls -lart"
-            }
-        }
-
         stage('Deploy to Prod') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'SSH-key', keyFileVariable: 'MY_SSH_KEY', usernameVariable: 'username')]) {
@@ -44,9 +52,7 @@ EOF
                 }
             }
         }
-       
-        
-       
+
         
     }
 }
