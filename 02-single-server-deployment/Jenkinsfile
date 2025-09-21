@@ -8,10 +8,6 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
-    #!/bin/bash
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip
     pip install -r 02-single-server-deployment/requirements.txt
 '''
 
