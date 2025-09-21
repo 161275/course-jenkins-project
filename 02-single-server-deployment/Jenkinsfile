@@ -9,15 +9,10 @@ pipeline {
             steps {
                 
                 sh '''
-                    # Create a virtual environment
-                    python3 -m venv venv
-
-                    # Activate the virtual environment
-                    source venv/bin/activate
-
-                    # Upgrade pip inside venv
-                    pip install --upgrade pip
-                    pip install -r 02-single-server-deployment/requirements.txt"
+                   python3 -m venv venv
+                   source venv/bin/activate
+                   pip install --upgrade pip
+                   pip install -r 02-single-server-deployment/requirements.txt
                 '''
             }
         }
