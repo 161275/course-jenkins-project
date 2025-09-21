@@ -4,36 +4,31 @@ pipeline {
     environment {
         SERVER_IP = credentials('prod-server')
     }
+
+            
     stages {
-        stage('Pre') {
+        stage('setup') {
             agent {
                 docker {
                     image 'python:3.8-alpine'
                     args "-u root"
                 }
             }
-            stages {
-                stage('setup') {
-                    steps {
-                        sh '''
-                        sudo su
-                        apt update 
-                        apt install pip3
-                        pip install -r requirements.txt
-                        '''
-                    }
-                }
-                stage('Test') {
-                    steps {
-                        sh "pytest"
-                    }
-                }
-                stage('Package code') {
-                    steps {
-                        sh "zip -r myapp.zip ./* -x '*.git*'"
-                        sh "ls -lart"
-                    }
-                }
+            steps {
+                sh '''
+                pip install -r requirements.txt
+                '''
+            }
+        }
+        stage('Test') {
+            steps {
+                sh "pytest"
+            }
+        }
+        stage('Package code') {
+            steps {
+                sh "zip -r myapp.zip ./* -x '*.git*'"
+                sh "ls -lart"
             }
         }
         stage('Deploy to Prod') {
@@ -47,12 +42,10 @@ pipeline {
                         cd /home/ec2-user/app/
                         pip install -r requirements.txt
                         sudo systemctl restart flaskapp.service
-EOF
+    EOF
                     '''
                 }
             }
         }
-
-        
     }
 }
