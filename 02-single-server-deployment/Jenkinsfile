@@ -10,7 +10,7 @@ pipeline {
         stage('setup') {
             agent {
                 docker {
-                    image 'python:3.8-alpine'
+                    image 'python:3.10-slim'
                     args "-u root -v /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
