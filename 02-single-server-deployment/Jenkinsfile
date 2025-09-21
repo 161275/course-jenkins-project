@@ -4,15 +4,10 @@ pipeline {
     environment {
         SERVER_IP = credentials('prod-server')
     }
-
-            
     stages {
-        stage('setup') {
+        stage('Setup') {
             steps {
-                sh '''
-                pip install -r 02-single-server-deployment/requirements.txt
-
-                '''
+                sh "pip install -r requirements.txt"
             }
         }
         stage('Test') {
@@ -20,12 +15,14 @@ pipeline {
                 sh "pytest"
             }
         }
+
         stage('Package code') {
             steps {
                 sh "zip -r myapp.zip ./* -x '*.git*'"
                 sh "ls -lart"
             }
         }
+
         stage('Deploy to Prod') {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'SSH-key', keyFileVariable: 'MY_SSH_KEY', usernameVariable: 'username')]) {
@@ -37,10 +34,14 @@ pipeline {
                         cd /home/ec2-user/app/
                         pip install -r requirements.txt
                         sudo systemctl restart flaskapp.service
-    EOF
+EOF
                     '''
                 }
             }
         }
+       
+        
+       
+        
     }
 }
