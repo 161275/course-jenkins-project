@@ -8,7 +8,8 @@ pipeline {
         stage('Setup') {
             steps {
                 sh '''
-                sudo apt update 
+                sudo su
+                apt update 
                 apt install pip3
                 pip install -r requirements.txt
                 '''
